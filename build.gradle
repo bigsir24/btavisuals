@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7.bta'
+	id 'fabric-loom' version '1.7.local'
 	id 'java'
 }
 
@@ -78,6 +78,14 @@ repositories {
 		}
 		metadataSources { artifact() }
 	}
+	ivy {
+		url = "https://github.com/bigsir24"
+		patternLayout {
+			artifact "debug-utils/releases/download/[revision]/[module]-[revision]+${project.bta_version}.jar"
+			m2compatible = true
+		}
+		metadataSources { artifact() }
+	}
 
 }
 
@@ -91,6 +99,7 @@ dependencies {
 	// Helper library
 	// If you do not need Halplibe you can comment this line out or delete this line
 	modImplementation("turniplabs:halplibe:${project.halplibe_version}")
+	//modImplementation("com.github.bigsir24:debug-utils:${project.debug_utils_version}")
 
 	modImplementation("turniplabs:modmenu-bta:${project.mod_menu_version}")
 

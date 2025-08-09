@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "btavisuals",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This mod aims to help new BTA modders.",
+  "name": "BTAVisuals",
+  "description": "",
   "authors": [
-    "Turnip Labs"
+    "Big Sir"
   ],
   "contact": {
     "homepage": "",
@@ -14,29 +14,29 @@
   },
 
 	"icon": "icon.png",
-  "license": "CC0-1.0",
+  "license": "GPL-3.0",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "main": [
-			"turniplabs.examplemod.ExampleMod"
+			"bigsir.btavisuals.BTAVisuals"
     ],
-		"beforeGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+		"beforeClientStart": [
+			"bigsir.btavisuals.BTAVisuals"
 		],
-		"afterGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+		"afterClientStart": [
+			"bigsir.btavisuals.BTAVisuals"
 		],
-		"recipesReady": [
-			"turniplabs.examplemod.ExampleMod"
+		"initOptions": [
+			"bigsir.btavisuals.BTAVisuals"
 		]
 	},
   "mixins": [
-      "examplemod.mixins.json"
+      "mixins.json"
   ],
 
   "depends": {
-		"minecraft": "*",
+		"minecraft": ">=7.3",
     "fabricloader": ">=0.15.5"
   },
   "suggests": {

@@ -1,0 +1,46 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "bigsir.btavisuals.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "client": [
+    "BlockModelDispatcherMixin",
+    "BlockModelFenceThinMixin",
+    "BlockModelFluidMixin",
+    "BlockModelGrassMixin",
+    "BlockModelLeavesMixin",
+    "BooleanOptionAccessor",
+    "BooleanOptionComponentMixin",
+    "EntityRendererItemMixin",
+    "EntityRendererMixin",
+    "GameSettingsMixin",
+    "ItemModelBlockMixin",
+    "ItemModelStandardMixin",
+    "ItemRendererMixin",
+    "LightingMixin",
+    "MobRendererMixin",
+    "MobRendererPlayerMixin",
+    "MobRendererSpiderMixin",
+    "PlayerMixin",
+    "RenderBlocksMixin",
+    "RenderGlobalMixin",
+    "ScreenInventoryMixin",
+    "ScreenOptionsAccessor",
+    "TerrainRendererLegacyMixin",
+    "ToggleableOptionComponentMixin",
+    "WorldRendererMixin",
+    "selection.SelectionMinecraftMixin",
+    "selection.SelectionRenderBlocksMixin",
+    "weather.FixRainMixin",
+    "weather.FixSnowMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "ScreenOptionsMixin",
+    "WorldMixin",
+    "WorldTypeAccessor",
+    "selection.SelectionRenderGlobalMixin"
+  ]
+}

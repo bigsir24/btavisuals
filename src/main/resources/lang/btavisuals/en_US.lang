@@ -1,0 +1,69 @@
+btavisuals.options=BTA Visuals
+btavisuals.options.display=Display
+btavisuals.options.graphics=Graphics
+btavisuals.options.clouds=Clouds
+btavisuals.options.weather=Weather
+btavisuals.options.players=Players
+btavisuals.options.labels=Labels
+btavisuals.options.misc=Miscellaneous
+btavisuals.options.overlay=Overlay
+btavisuals.options.world=World
+btavisuals.options.selector=Selector
+
+options.btavisuals.billboard_items=Billboard Items
+options.btavisuals.smooth_water=Smooth Water §1(Experimental)
+options.btavisuals.side_light_direction=Side Light Direction
+options.btavisuals.far_plane_distance=Far Plane Distance
+options.btavisuals.fog_distance=Fog Distance
+options.btavisuals.cloud_distance=Cloud Distance
+options.btavisuals.cloud_fog_distance=Cloud Fog Distance
+options.btavisuals.tinted_clouds=Tinted Clouds
+options.btavisuals.dual_pass_on_fast=Dual Pass on Fast
+options.btavisuals.cloud_mode=Clouds
+options.btavisuals.leaves_mode=Leaves
+options.btavisuals.grass_mode=Grass
+
+options.btavisuals.snow_opacity=Snow Opacity Limit
+options.btavisuals.rain_opacity=Rain Opacity Limit
+options.btavisuals.snow_type=Snow Type
+options.btavisuals.rain_particle_limit=Rain Particle Limit
+
+options.btavisuals.show_own_nameplate=Show Own Nameplate
+options.btavisuals.smooth_inv_model=Smooth Inventory Model
+options.btavisuals.hide_nameplates=Hide Nameplates
+options.btavisuals.all_steve=Oops, All Steve!
+options.btavisuals.color_mode=Color Mode
+options.btavisuals.fix_carried_block_shading=Fix Carried Block Shading
+options.btavisuals.animal_labels=Animal Labels
+
+options.btavisuals.fire_overlay=Fire Overlay
+options.btavisuals.fire_overlay_offset=Fire Overlay Offset
+options.btavisuals.animation_ticks=Animation Ticks
+options.btavisuals.animation_ticks=Animation Ticks
+
+options.btavisuals.leaf_pile_graphics=Leaf Pile Graphics
+
+options.btavisuals.selector_type=Selector Type
+options.btavisuals.selector_blink_frequency=Blink Frequency
+options.btavisuals.selector_blink_min=Min Blink Brightness
+options.btavisuals.selector_blink_max=Max Blink Brightness
+options.btavisuals.selector_depth_test=Depth Test
+
+options.btavisuals.seasonal_sun_path=Seasonal Sun Path
+
+options.btavisuals.transparent=Transparent
+options.btavisuals.two_sided=Two-Sided
+options.btavisuals.default=Default
+options.btavisuals.flipped=Flipped
+options.btavisuals.none=None
+options.btavisuals.light=Light
+options.btavisuals.heavy=Heavy
+options.btavisuals.fast=Fast
+options.btavisuals.fancy=Fancy
+options.btavisuals.visible=Visible
+options.btavisuals.icons=Icons
+options.btavisuals.hidden=Hidden
+options.btavisuals.static=Static
+options.btavisuals.dynamic=Dynamic
+options.btavisuals.blinking=Blinking
+options.btavisuals.bright=Bright
