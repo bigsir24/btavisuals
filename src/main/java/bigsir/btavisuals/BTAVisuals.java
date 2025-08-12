@@ -1,22 +1,41 @@
 package bigsir.btavisuals;
 
+import bigsir.btavisuals.mixin.shader.ShaderAccessor;
+import bigsir.btavisuals.shader.Bayer;
+import bigsir.btavisuals.shader.ShaderProviderJar;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.options.components.BooleanOptionComponent;
 import net.minecraft.client.gui.options.components.OptionsCategory;
 import net.minecraft.client.gui.options.components.ToggleableOptionComponent;
 import net.minecraft.client.gui.options.data.OptionsPage;
 import net.minecraft.client.gui.options.data.OptionsPages;
+import net.minecraft.client.input.InputDevice;
 import net.minecraft.client.option.GameSettings;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.OptionBoolean;
 import net.minecraft.client.option.OptionRange;
+import net.minecraft.client.render.shader.Shader;
 import net.minecraft.core.item.Items;
 import net.minecraft.core.lang.I18n;
 import net.minecraft.core.util.helper.DamageType;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.OptionsInitEntrypoint;
+
+import java.io.IOException;
+import java.nio.FloatBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, OptionsInitEntrypoint {
     public static final String MOD_ID = "btavisuals";
@@ -65,6 +84,14 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 	public static OptionRange selectorBlinkMin;
 	public static OptionRange selectorBlinkMax;
 	public static OptionBoolean selectorDepthTest;
+	public static OptionBoolean blinkingItems;
+	public static OptionBoolean enableToneMap;
+	public static OptionBoolean enableDither;
+	public static OptionRange redBits;
+	public static OptionRange greenBits;
+	public static OptionRange blueBits;
+	public static OptionRange bayerMatrix;
+	public static OptionRange bayerBrightness;
 	public static final String[] leavesModeString = new String[]{"options.btavisuals.fast", "options.btavisuals.fancy", "options.btavisuals.transparent", "options.btavisuals.two_sided"};
 	public static final String[] snowTypeString = new String[]{"options.btavisuals.default", "options.btavisuals.light", "options.btavisuals.heavy"};
 	public static final String[] animalLabelsString = new String[]{"options.btavisuals.visible", "options.btavisuals.icons", "options.btavisuals.hidden"};
@@ -72,6 +99,31 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 	public static final String[] fireOverlayString = new String[]{"options.btavisuals.static", "options.btavisuals.dynamic"};
 	public static final String[] selectorTypeString = new String[]{"options.btavisuals.default", "options.btavisuals.blinking", "options.btavisuals.bright"};
 	public static Minecraft mc;
+	public static Shader shader;
+	public static KeyBinding recompile;
+	public static FloatBuffer bayerCache = BufferUtils.createFloatBuffer(256);
+	public static int bayerSizeCache;
+	public static float bayerBrightnessCache;
+	public static float bayerMaxCache;
+	public static float[] stepCache = new float[3];
+
+	public static void setupToneMap() {
+		float nRed = (float) Math.pow(2, redBits.value);
+		float nBlue = (float) Math.pow(2, greenBits.value);
+		float nGreen = (float) Math.pow(2, blueBits.value);
+		stepCache[0] = nRed <= 1 ? 0 : 1.0F / (nRed-1.0F);
+		stepCache[1] = nGreen <= 1 ? 0 : 1.0F / (nGreen-1.0F);
+		stepCache[2] = nBlue <= 1 ? 0 : 1.0F / (nBlue-1.0F);
+	}
+
+	public static void setupBayer() {
+		float[] bayerArray = Bayer.gen1DBayerF(bayerMatrix.value);
+		bayerCache.position(0).limit(bayerArray.length);
+		bayerCache.put(bayerArray);
+		bayerCache.position(0).limit(bayerArray.length);
+		bayerMaxCache = (float) Bayer.max;
+		bayerSizeCache = (int) Math.pow(2, bayerMatrix.value+1);
+	}
 
     @Override
     public void onInitialize() {
@@ -85,6 +137,8 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 	@Override
 	public void afterClientStart() {
 		mc = Minecraft.getMinecraft();
+		shader = new Shader().compile(new ShaderProviderJar(MOD_ID), "post_dither");
+		recompile = new KeyBinding("options.compile").setDefault(InputDevice.keyboard, Keyboard.KEY_O);
 
 		OptionsPage page = modPage = new OptionsPage(tk("options"), Items.PAINTBRUSH.getDefaultStack());
 		OptionsPages.register(page);
@@ -101,6 +155,7 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 
 		page.withComponent(new OptionsCategory(tk("options.display"))
 			.withComponent(new BooleanOptionComponent(billboardItems))
+			.withComponent(new BooleanOptionComponent(blinkingItems))
 			.withComponent(new ToggleableOptionComponent<>(farPlaneDistance))
 			.withComponent(new ToggleableOptionComponent<>(fogDistance))
 		);
@@ -155,6 +210,16 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 
 		page.withComponent(new OptionsCategory(tk("options.misc"))
 			.withComponent(new BooleanOptionComponent(seasonalSunPath))
+		);
+
+		page.withComponent(new OptionsCategory(tk("options.tone_map"))
+			.withComponent(new BooleanOptionComponent(enableToneMap))
+			.withComponent(new ToggleableOptionComponent<>(redBits))
+			.withComponent(new ToggleableOptionComponent<>(greenBits))
+			.withComponent(new ToggleableOptionComponent<>(blueBits))
+			.withComponent(new BooleanOptionComponent(enableDither))
+			.withComponent(new ToggleableOptionComponent<>(bayerBrightness))
+			.withComponent(new ToggleableOptionComponent<>(bayerMatrix))
 		);
 	}
 
@@ -213,10 +278,45 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 		selectorBlinkMin = new OptionRange(settings, tk("selector_blink_min"), 0, 61);
 		selectorBlinkMax = new OptionRange(settings, tk("selector_blink_max"), 15, 61);
 		selectorDepthTest = new OptionBoolean(settings, tk("selector_depth_test"), true);
+
+		enableToneMap = new OptionBoolean(settings, tk("enable_tone_map"), false);
+		enableDither = new OptionBoolean(settings, tk("enable_dither"), false);
+		redBits = new OptionRange(settings, tk("red_bits"), 3, 9);
+		greenBits = new OptionRange(settings, tk("green_bits"), 3, 9);
+		blueBits = new OptionRange(settings, tk("blue_bits"), 2, 9);
+		bayerMatrix = new OptionRange(settings, tk("bayer_matrix"), 3, 4);
+		bayerBrightness = new OptionRange(settings, tk("bayer_brightness"), 25, 101);
+
+		blinkingItems = new OptionBoolean(settings, tk("blinking_items"), false);
+
+		setupBayer();
+		setupToneMap();
+		bayerBrightnessCache = bayerBrightness.value / 100.0F;
 	}
 
 	private static String tk(String str) {
 		return MOD_ID + "." + str;
+	}
+
+	@SuppressWarnings("OptionalGetWithoutIsPresent")
+	public static void devBuildResources() {
+		ModContainer mod = FabricLoader.getInstance().getModContainer(MOD_ID).get();
+		Path path = mod.findPath("assets").get();
+		if ("jar".equals(path.toUri().getScheme())) return; // Return if jar
+
+		Path shadersBuildFolder = path.resolve(MOD_ID + "/shaders");
+		Path projectResources = path.getRoot().resolve(path.subpath(0, path.getNameCount() - 4)).resolve("src/main/resources/assets/" + MOD_ID + "/shaders");
+
+		try (Stream<Path> pathStream = Files.list(projectResources)){
+			for (Path shaderFile : pathStream.collect(Collectors.toList())) {
+				Files.copy(shaderFile, shadersBuildFolder.resolve(shaderFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+			}
+		} catch (IOException ignore) {}
+	}
+
+	public static void compileShaders() {
+		if (shader != null) GL20.glDeleteProgram(((ShaderAccessor)shader).getProgram());
+		shader = new Shader().compile(new ShaderProviderJar(MOD_ID), "post_dither");
 	}
 
 	public static float sideLight(int sideId) {

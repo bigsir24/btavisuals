@@ -1,5 +1,6 @@
 package bigsir.btavisuals.mixin;
 
+import bigsir.btavisuals.BTAVisuals;
 import net.minecraft.client.render.entity.EntityRendererItem;
 import net.minecraft.client.render.tessellator.Tessellator;
 import net.minecraft.core.entity.EntityItem;
@@ -13,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class EntityRendererItemMixin {
 	@Inject(method = "render(Lnet/minecraft/client/render/tessellator/Tessellator;Lnet/minecraft/core/entity/EntityItem;DDDFF)V", at = @At(value = "HEAD"), cancellable = true)
 	public void flash(Tessellator tessellator, EntityItem entity, double x, double y, double z, float yaw, float partialTick, CallbackInfo ci) {
-		if (entity.age >= 5900 && entity.age % 8 < 4) ci.cancel();
+		if (BTAVisuals.blinkingItems.value && entity.age >= 5900 && entity.age % 8 < 4) ci.cancel();
 	}
 }

@@ -31,16 +31,21 @@
     "WorldRendererMixin",
     "selection.SelectionMinecraftMixin",
     "selection.SelectionRenderBlocksMixin",
+    "shader.LightmapHelperAccessor",
+    "shader.MinecraftMixin",
+    "shader.MobRendererMixin",
+    "shader.ScreenInventoryCreativeMixin",
+    "shader.ShaderAccessor",
+    "shader.ShadersRendererAccessor",
+    "shader.ShadersRendererMixin",
     "weather.FixRainMixin",
-    "weather.FixSnowMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "mixins": [
+    "weather.FixSnowMixin",
     "ScreenOptionsMixin",
     "WorldMixin",
     "WorldTypeAccessor",
     "selection.SelectionRenderGlobalMixin"
-  ]
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

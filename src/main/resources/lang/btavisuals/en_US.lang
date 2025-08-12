@@ -9,6 +9,7 @@ btavisuals.options.misc=Miscellaneous
 btavisuals.options.overlay=Overlay
 btavisuals.options.world=World
 btavisuals.options.selector=Selector
+btavisuals.options.tone_map=Tone Map Shader
 
 options.btavisuals.billboard_items=Billboard Items
 options.btavisuals.smooth_water=Smooth Water §1(Experimental)
@@ -48,6 +49,16 @@ options.btavisuals.selector_blink_frequency=Blink Frequency
 options.btavisuals.selector_blink_min=Min Blink Brightness
 options.btavisuals.selector_blink_max=Max Blink Brightness
 options.btavisuals.selector_depth_test=Depth Test
+
+options.btavisuals.enable_tone_map=Enable Tone Map
+options.btavisuals.enable_dither=Enable Dithering
+options.btavisuals.red_bits=Red Bits
+options.btavisuals.green_bits=Green Bits
+options.btavisuals.blue_bits=Blue Bits
+options.btavisuals.bayer_matrix=Bayer Matrix
+options.btavisuals.bayer_brightness=Bayer Brightness
+
+options.btavisuals.blinking_items=Blinking Items
 
 options.btavisuals.seasonal_sun_path=Seasonal Sun Path
 

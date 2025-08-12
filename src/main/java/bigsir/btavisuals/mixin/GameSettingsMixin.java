@@ -25,6 +25,12 @@ public abstract class GameSettingsMixin {
 	public void reloadRenderers(Option<?> option, CallbackInfo ci) {
 		if (option == BTAVisuals.smoothWater || option == BTAVisuals.leafPileGraphics) {
 			mc.renderGlobal.loadRenderers();
+		}else if(option == BTAVisuals.redBits || option == BTAVisuals.greenBits || option == BTAVisuals.blueBits) {
+			BTAVisuals.setupToneMap();
+		}else if(option == BTAVisuals.bayerMatrix) {
+			BTAVisuals.setupBayer();
+		}else if(option == BTAVisuals.bayerBrightness) {
+			BTAVisuals.bayerBrightnessCache = BTAVisuals.bayerBrightness.value / 100.0F;
 		}
 	}
 
@@ -34,7 +40,11 @@ public abstract class GameSettingsMixin {
 			cir.setReturnValue(BTAVisuals.translateRange(BTAVisuals.leavesModeString, BTAVisuals.leavesMode));
 		} else if (option == BTAVisuals.cloudMode || option == BTAVisuals.grassMode) {
 			cir.setReturnValue(I18n.getInstance().translateKey(((OptionRange) option).value == 1 ? "options.btavisuals.fancy" : "options.btavisuals.fast"));
-		} else if (option == BTAVisuals.rainOpacity || option == BTAVisuals.snowOpacity || option == BTAVisuals.rainParticleAmount || option == BTAVisuals.animationTicks) {
+		} else if (option == BTAVisuals.rainOpacity
+			|| option == BTAVisuals.snowOpacity
+			|| option == BTAVisuals.rainParticleAmount
+			|| option == BTAVisuals.animationTicks
+			|| option == BTAVisuals.bayerBrightness) {
 			cir.setReturnValue(option.value + "%");
 		} else if (option == BTAVisuals.snowType) {
 			cir.setReturnValue(BTAVisuals.translateRange(BTAVisuals.snowTypeString, BTAVisuals.snowType));
@@ -52,6 +62,9 @@ public abstract class GameSettingsMixin {
 			cir.setReturnValue(BTAVisuals.translateRange(BTAVisuals.selectorTypeString, (OptionRange) option));
 		} else if (option == BTAVisuals.fireOverlayOffset) {
 			cir.setReturnValue(String.valueOf(((OptionRange)option).value / 100.0F));
+		}else if(option == BTAVisuals.bayerMatrix) {
+			int size = BTAVisuals.bayerSizeCache;
+			cir.setReturnValue(size + "x" + size);
 		}
 	}
 }
