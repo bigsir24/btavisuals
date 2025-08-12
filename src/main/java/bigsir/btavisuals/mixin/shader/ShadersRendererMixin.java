@@ -9,24 +9,16 @@ import net.minecraft.client.render.shader.Shaders;
 import net.minecraft.client.render.shader.ShadersRenderer;
 import net.minecraft.client.render.texture.Texture;
 import org.lwjgl.opengl.ARBMultitexture;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ShadersRenderer.class, remap = false)
 public abstract class ShadersRendererMixin {
-	@Shadow
-	@Final
-	protected Shader postShader;
-
-	@Shadow
-	@Final
-	protected Framebuffer worldFramebuffer;
 
 	@Shadow
 	@Final
@@ -39,52 +31,9 @@ public abstract class ShadersRendererMixin {
 	@Shadow
 	public Minecraft mc;
 
-	@Shadow
-	@Final
-	protected Texture gameFramebufferTex;
-
-	@Inject(method = "beginRenderWorld", at = @At(value = "TAIL"))
-	public void useShader(float partialTicks, CallbackInfo ci) {
-		//ARBMultitexture.glActiveTextureARB(33984);
-		//BTAVisuals.shader.bind();
-	}
-
 	@Redirect(method = "endRenderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/shader/Shader;isEnabled()Z", ordinal = 1))
-	public boolean fix(Shader instance) {
-		//this.worldFramebuffer.bind();
-		if(true) return false;
-		return instance.isEnabled();
-	}
-
-	@Redirect(method = "endRenderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/shader/Shader;bind()V"))
-	public void bindNew(Shader instance) {
-		BTAVisuals.shader.bind();
-	}
-
-	@Redirect(method = "endRenderWorld", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/render/texture/Texture;bind()Z", ordinal = 0))
-	public boolean f(Texture instance) {
-		//return worldFramebufferTex.bind();
-		return instance.bind();
-	}
-
-	@Redirect(method = "endRenderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/shader/Shader;uniformInt(Ljava/lang/String;I)V"))
-	public void bindNew2(Shader instance, String name, int value) {
-		BTAVisuals.shader.uniformInt(name, value);
-	}
-
-	@Redirect(method = "endRenderWorld", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/shader/ShadersRenderer;postShader:Lnet/minecraft/client/render/shader/Shader;", ordinal = 0))
-	public Shader bindNew3(ShadersRenderer instance) {
-		return postShader;
-	}
-
-	@Redirect(method = "endRenderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/shader/Shaders;drawFullscreenRect()V"))
-	public void noDraw() {
-		Shaders.drawFullscreenRect();
-	}
-
-	@Redirect(method = "endRenderWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/texture/Texture;bind()Z", ordinal = 2))
-	public boolean noBind(Texture instance) {
-		return instance.bind();
+	public boolean redirectShader(Shader instance) {
+		return !BTAVisuals.enableToneMap.value;
 	}
 
 	@Redirect(method = "endRenderWorld", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL20;glUseProgram(I)V", ordinal = 0))
@@ -96,6 +45,9 @@ public abstract class ShadersRendererMixin {
 		ARBMultitexture.glActiveTextureARB(33985);
 		this.worldFramebufferDepth.bind();
 		BTAVisuals.shader.uniformInt("depthtex0", 1);
+		ARBMultitexture.glActiveTextureARB(33986);
+		GL11.glBindTexture(GL11.GL_TEXTURE_1D, BTAVisuals.texMatrix);
+		BTAVisuals.shader.uniformInt("texMatrix", 2);
 		ARBMultitexture.glActiveTextureARB(33984);
 		mc.ppm.enabled = true;
 		Shaders.setUniforms(mc, BTAVisuals.shader, partialTicks);

@@ -7,6 +7,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.TooltipElement;
 import net.minecraft.client.gui.options.components.BooleanOptionComponent;
 import net.minecraft.client.gui.options.components.OptionsCategory;
 import net.minecraft.client.gui.options.components.ToggleableOptionComponent;
@@ -23,6 +24,9 @@ import net.minecraft.core.lang.I18n;
 import net.minecraft.core.util.helper.DamageType;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.ARBMultitexture;
+import org.lwjgl.opengl.ARBTextureFloat;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +34,12 @@ import turniplabs.halplibe.util.ClientStartEntrypoint;
 import turniplabs.halplibe.util.OptionsInitEntrypoint;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,22 +107,24 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 	public static Minecraft mc;
 	public static Shader shader;
 	public static KeyBinding recompile;
-	public static FloatBuffer bayerCache = BufferUtils.createFloatBuffer(256);
+	public static FloatBuffer bayerCache = BufferUtils.createFloatBuffer(4096);
 	public static int bayerSizeCache;
 	public static float bayerBrightnessCache;
 	public static float bayerMaxCache;
 	public static float[] stepCache = new float[3];
+	public static int texMatrix = -1;
 
 	public static void setupToneMap() {
 		float nRed = (float) Math.pow(2, redBits.value);
-		float nBlue = (float) Math.pow(2, greenBits.value);
-		float nGreen = (float) Math.pow(2, blueBits.value);
+		float nGreen = (float) Math.pow(2, greenBits.value);
+		float nBlue = (float) Math.pow(2, blueBits.value);
 		stepCache[0] = nRed <= 1 ? 0 : 1.0F / (nRed-1.0F);
 		stepCache[1] = nGreen <= 1 ? 0 : 1.0F / (nGreen-1.0F);
 		stepCache[2] = nBlue <= 1 ? 0 : 1.0F / (nBlue-1.0F);
 	}
 
 	public static void setupBayer() {
+		//TODO somehow use a texture instead, couldn't get it working
 		float[] bayerArray = Bayer.gen1DBayerF(bayerMatrix.value);
 		bayerCache.position(0).limit(bayerArray.length);
 		bayerCache.put(bayerArray);
@@ -221,6 +229,12 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 			.withComponent(new ToggleableOptionComponent<>(bayerBrightness))
 			.withComponent(new ToggleableOptionComponent<>(bayerMatrix))
 		);
+
+		/////////////// Needs options.txt to be loaded ///////////////
+		setupBayer();
+		setupToneMap();
+		bayerBrightnessCache = bayerBrightness.value / 100.0F;
+		/////////////// Needs options.txt to be loaded ///////////////
 	}
 
 	public static String translateRange(String[] array, OptionRange option) {
@@ -282,16 +296,12 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 		enableToneMap = new OptionBoolean(settings, tk("enable_tone_map"), false);
 		enableDither = new OptionBoolean(settings, tk("enable_dither"), false);
 		redBits = new OptionRange(settings, tk("red_bits"), 3, 9);
-		greenBits = new OptionRange(settings, tk("green_bits"), 3, 9);
-		blueBits = new OptionRange(settings, tk("blue_bits"), 2, 9);
+		greenBits = new OptionRange(settings, tk("green_bits"), 2, 9);
+		blueBits = new OptionRange(settings, tk("blue_bits"), 3, 9);
 		bayerMatrix = new OptionRange(settings, tk("bayer_matrix"), 3, 4);
 		bayerBrightness = new OptionRange(settings, tk("bayer_brightness"), 25, 101);
 
 		blinkingItems = new OptionBoolean(settings, tk("blinking_items"), false);
-
-		setupBayer();
-		setupToneMap();
-		bayerBrightnessCache = bayerBrightness.value / 100.0F;
 	}
 
 	private static String tk(String str) {

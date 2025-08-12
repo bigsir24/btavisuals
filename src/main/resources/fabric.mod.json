@@ -3,15 +3,16 @@
   "id": "btavisuals",
   "version": "${version}",
 
-  "name": "BTAVisuals",
-  "description": "",
+  "name": "BTA Visuals",
+  "description": "Adds various graphical options.",
   "authors": [
     "Big Sir"
   ],
   "contact": {
-    "homepage": "",
-    "sources": ""
-  },
+    "homepage": "https://github.com/bigsir24/btavisuals",
+    "sources": "",
+		"issues": "https://github.com/bigsir24/btavisuals/issues"
+	},
 
 	"icon": "icon.png",
   "license": "GPL-3.0",
