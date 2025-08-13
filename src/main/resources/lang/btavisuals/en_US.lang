@@ -10,6 +10,7 @@ btavisuals.options.overlay=Overlay
 btavisuals.options.world=World
 btavisuals.options.selector=Selector
 btavisuals.options.tone_map=Tone Map Shader
+btavisuals.options.falloff=Fall-off
 
 options.btavisuals.billboard_items=Billboard Items
 options.btavisuals.smooth_water=Smooth Water §1(Experimental)
@@ -58,6 +59,17 @@ options.btavisuals.blue_bits=Blue Bits
 options.btavisuals.bayer_matrix=Bayer Matrix
 options.btavisuals.bayer_brightness=Bayer Brightness
 
+
+options.btavisuals.tone_map_falloff=Tone Map Fall-off
+options.btavisuals.tone_map_falloff_start=Tone Map Fall-off Start
+options.btavisuals.tone_map_falloff_end=Tone Map Fall-off End
+
+options.btavisuals.dither_falloff=Dithering Fall-off
+options.btavisuals.dither_falloff_start=Dithering Fall-off Start
+options.btavisuals.dither_falloff_end=Dithering Fall-off End
+
+options.btavisuals.falloff_type=Fall-off Type
+
 options.btavisuals.blinking_items=Blinking Items
 
 options.btavisuals.seasonal_sun_path=Seasonal Sun Path
@@ -78,3 +90,8 @@ options.btavisuals.static=Static
 options.btavisuals.dynamic=Dynamic
 options.btavisuals.blinking=Blinking
 options.btavisuals.bright=Bright
+options.btavisuals.disabled=Disabled
+options.btavisuals.normal=Normal
+options.btavisuals.inverted=Inverted
+options.btavisuals.spherical=Spherical
+options.btavisuals.linear=Linear

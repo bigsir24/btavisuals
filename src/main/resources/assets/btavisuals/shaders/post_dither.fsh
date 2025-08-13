@@ -31,6 +31,13 @@ uniform int bayerSize;
 uniform float bayerMax;
 uniform float bayerBrightness;
 
+uniform mat4 projectionInverse;
+uniform vec2 screen;
+uniform float farPlane;
+uniform vec3 falloffTone;
+uniform vec3 falloffDither;
+uniform int falloffType;
+
 varying vec2 texcoord;
 
 #define PI 3.14159
@@ -158,6 +165,17 @@ vec3 colorEffects(vec3 tex) {
     return tex;
 }
 
+float fog_depth(){
+    vec4 ndc = projectionInverse * vec4((gl_FragCoord.xy / screen) * 2. - 1., texture2D(depthtex0, texcoord.xy).r * 2. - 1., 1);
+    return length(ndc.xyz / ndc.w);
+}
+
+float lin_depth(){
+    float z = texture2D(depthtex0, texcoord.xy).r * 2.0F - 1.0F;
+    float nearPlane = 0.05;
+    return (2.0F * nearPlane * farPlane) / (farPlane + nearPlane - z * (farPlane - nearPlane));
+}
+
 
 void main() {
     vec3 color = vec3(0.0);
@@ -185,15 +203,25 @@ void main() {
     color = adjustColor(color, rMod, gMod, bMod);
     color = colorEffects(color);
 
+    float depth = falloffType == 0 ? fog_depth() : lin_depth();
+    float start = falloffDither.x;
+    float factor = clamp((start  - depth) / (start - falloffDither.y), 0, 1);
     if (dither) {
         int w = (int(mod(gl_FragCoord.x, bayerSize)));
         int h = (int(mod(gl_FragCoord.y, bayerSize)));
         float bayerVal = bayerBrightness * (bayer[w + h*bayerSize] - bayerMax * 0.5);
+
+        //gl_FragColor = vec4(vec3(1-factor, 0, 0), 1);
+        //return;
+        if (falloffDither.z > 0) bayerVal *= falloffDither.z == 1 ? 1 - factor : factor;
         color.r = clamp(color.r + bayerVal, 0, 1);
         color.g = clamp(color.g + bayerVal, 0, 1);
         color.b = clamp(color.b + bayerVal, 0, 1);
     }
 
+    start = falloffTone.x;
+    factor = clamp((start  - depth) / (start - falloffTone.y), 0, 1);
+    vec3 oldcol = vec3(color);
     if (length(step) == 0) {
         color = vec3((color.r * 0.299 + color.g * 0.587 + color.b * 0.114) > 0.5 ? 1 : 0);
     } else if (tonemap) {
@@ -202,6 +230,12 @@ void main() {
         color.g = color.g - diff.g + (diff.g > step.g * 0.5 ? step.g : 0);
         color.b = color.b - diff.b + (diff.b > step.b * 0.5 ? step.b : 0);
     }
+    if (falloffTone.z == 1) {
+        color = factor * oldcol + (1 - factor) * color;
+    }else if(falloffTone.z == 2){
+        color = factor * color + (1 - factor) * oldcol;
+    }
+
 
     gl_FragColor = vec4(color, 1.0);
 }

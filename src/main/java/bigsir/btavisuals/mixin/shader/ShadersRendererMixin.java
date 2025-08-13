@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+import java.nio.FloatBuffer;
+
 @Mixin(value = ShadersRenderer.class, remap = false)
 public abstract class ShadersRendererMixin {
 
@@ -56,6 +58,18 @@ public abstract class ShadersRendererMixin {
 		BTAVisuals.shader.uniformBool("tonemap", BTAVisuals.enableToneMap.value);
 		BTAVisuals.shader.uniformBool("dither", BTAVisuals.enableDither.value);
 		GL20.glUniform3fv(BTAVisuals.shader.getUniform("step"), BTAVisuals.stepCache);
+
+		Minecraft mc = Minecraft.getMinecraft();
+		FloatBuffer projInverse = ((ShadersRendererAccessor)mc.renderer).getMatrixBuffer();
+		projInverse.position(0).limit(16);
+		GL20.glUniformMatrix4fv(BTAVisuals.shader.getUniform("projectionInverse"), false, projInverse);
+		float scale = (float) this.mc.gameSettings.renderScale.value.scale;
+		GL20.glUniform2f(BTAVisuals.shader.getUniform("screen"), mc.gameWindow.getWidthPixels() * scale, mc.gameWindow.getHeightPixels() * scale);
+		GL20.glUniform1f(BTAVisuals.shader.getUniform("farPlane"), BTAVisuals.farPlaneDistance.value + 1);
+
+		GL20.glUniform3f(BTAVisuals.shader.getUniform("falloffTone"), BTAVisuals.toneMapFalloffStart.value, BTAVisuals.toneMapFalloffEnd.value ,BTAVisuals.toneMapFalloff.value);
+		GL20.glUniform3f(BTAVisuals.shader.getUniform("falloffDither"), BTAVisuals.ditherFalloffStart.value, BTAVisuals.ditherFalloffEnd.value ,BTAVisuals.ditherFalloff.value);
+		GL20.glUniform1i(BTAVisuals.shader.getUniform("falloffType"), BTAVisuals.falloffType.value);
 
 		BTAVisuals.bayerCache.position(0);
 		GL20.glUniform1fv(GL20.glGetUniformLocation(((ShaderAccessor)BTAVisuals.shader).getProgram(), "bayer"), BTAVisuals.bayerCache);

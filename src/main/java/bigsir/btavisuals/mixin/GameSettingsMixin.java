@@ -65,6 +65,10 @@ public abstract class GameSettingsMixin {
 		}else if(option == BTAVisuals.bayerMatrix) {
 			int size = BTAVisuals.bayerSizeCache;
 			cir.setReturnValue(size + "x" + size);
+		} else if (option == BTAVisuals.ditherFalloff || option == BTAVisuals.toneMapFalloff) {
+			cir.setReturnValue(BTAVisuals.translateRange(BTAVisuals.falloffString, (OptionRange) option));
+		} else if (option == BTAVisuals.falloffType) {
+			cir.setReturnValue(BTAVisuals.translateRange(BTAVisuals.falloffTypeString, (OptionRange) option));
 		}
 	}
 }

@@ -98,12 +98,21 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 	public static OptionRange blueBits;
 	public static OptionRange bayerMatrix;
 	public static OptionRange bayerBrightness;
+	public static OptionRange toneMapFalloff;
+	public static OptionRange toneMapFalloffStart;
+	public static OptionRange toneMapFalloffEnd;
+	public static OptionRange ditherFalloff;
+	public static OptionRange ditherFalloffStart;
+	public static OptionRange ditherFalloffEnd;
+	public static OptionRange falloffType;
 	public static final String[] leavesModeString = new String[]{"options.btavisuals.fast", "options.btavisuals.fancy", "options.btavisuals.transparent", "options.btavisuals.two_sided"};
 	public static final String[] snowTypeString = new String[]{"options.btavisuals.default", "options.btavisuals.light", "options.btavisuals.heavy"};
 	public static final String[] animalLabelsString = new String[]{"options.btavisuals.visible", "options.btavisuals.icons", "options.btavisuals.hidden"};
 	public static final String[] sideLightString = new String[]{"options.btavisuals.default", "options.btavisuals.flipped", "options.btavisuals.none"};
 	public static final String[] fireOverlayString = new String[]{"options.btavisuals.static", "options.btavisuals.dynamic"};
 	public static final String[] selectorTypeString = new String[]{"options.btavisuals.default", "options.btavisuals.blinking", "options.btavisuals.bright"};
+	public static final String[] falloffString = new String[]{"options.btavisuals.disabled", "options.btavisuals.normal", "options.btavisuals.inverted"};
+	public static final String[] falloffTypeString = new String[]{"options.btavisuals.spherical", "options.btavisuals.linear"};
 	public static Minecraft mc;
 	public static Shader shader;
 	public static KeyBinding recompile;
@@ -230,6 +239,16 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 			.withComponent(new ToggleableOptionComponent<>(bayerMatrix))
 		);
 
+		page.withComponent(new OptionsCategory(tk("options.falloff"))
+			.withComponent(new ToggleableOptionComponent<>(falloffType))
+			.withComponent(new ToggleableOptionComponent<>(toneMapFalloff))
+			.withComponent(new ToggleableOptionComponent<>(toneMapFalloffStart))
+			.withComponent(new ToggleableOptionComponent<>(toneMapFalloffEnd))
+			.withComponent(new ToggleableOptionComponent<>(ditherFalloff))
+			.withComponent(new ToggleableOptionComponent<>(ditherFalloffStart))
+			.withComponent(new ToggleableOptionComponent<>(ditherFalloffEnd))
+		);
+
 		/////////////// Needs options.txt to be loaded ///////////////
 		setupBayer();
 		setupToneMap();
@@ -300,6 +319,16 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 		blueBits = new OptionRange(settings, tk("blue_bits"), 3, 9);
 		bayerMatrix = new OptionRange(settings, tk("bayer_matrix"), 3, 4);
 		bayerBrightness = new OptionRange(settings, tk("bayer_brightness"), 25, 101);
+
+		toneMapFalloff = new OptionRange(settings, tk("tone_map_falloff"), 0, 3);
+		toneMapFalloffStart = new OptionRange(settings, tk("tone_map_falloff_start"), 0, 512);
+		toneMapFalloffEnd = new OptionRange(settings, tk("tone_map_falloff_end"), 32, 512);
+
+		ditherFalloff = new OptionRange(settings, tk("dither_falloff"), 0, 3);
+		ditherFalloffStart = new OptionRange(settings, tk("dither_falloff_start"), 0, 512);
+		ditherFalloffEnd = new OptionRange(settings, tk("dither_falloff_end"), 32, 512);
+
+		falloffType = new OptionRange(settings, tk("falloff_type"), 0, 2);
 
 		blinkingItems = new OptionBoolean(settings, tk("blinking_items"), false);
 	}
