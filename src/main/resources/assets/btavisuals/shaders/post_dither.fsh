@@ -186,7 +186,6 @@ void main() {
     color = colorEffects(color);
 
     if (dither) {
-        //float bayer[16] = float[16](0.0, 0.5, 0.125, 0.625, 0.75, 0.25, 0.875, 0.375, 0.1875, 0.6875, 0.0625, 0.5625, 0.9375, 0.4375, 0.8125, 0.3125);
         int w = (int(mod(gl_FragCoord.x, bayerSize)));
         int h = (int(mod(gl_FragCoord.y, bayerSize)));
         float bayerVal = bayerBrightness * (bayer[w + h*bayerSize] - bayerMax * 0.5);
@@ -195,7 +194,9 @@ void main() {
         color.b = clamp(color.b + bayerVal, 0, 1);
     }
 
-    if (tonemap) {
+    if (length(step) == 0) {
+        color = vec3((color.r * 0.299 + color.g * 0.587 + color.b * 0.114) > 0.5 ? 1 : 0);
+    } else if (tonemap) {
         vec3 diff = vec3(mod(color.r, step.r), mod(color.g, step.g), mod(color.b, step.b));
         color.r = color.r - diff.r + (diff.r > step.r * 0.5 ? step.r : 0);
         color.g = color.g - diff.g + (diff.g > step.g * 0.5 ? step.g : 0);

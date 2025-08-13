@@ -26,11 +26,15 @@
     "RenderGlobalMixin",
     "ScreenInventoryMixin",
     "ScreenOptionsAccessor",
+    "ScreenOptionsMixin",
     "TerrainRendererLegacyMixin",
     "ToggleableOptionComponentMixin",
+    "WorldMixin",
     "WorldRendererMixin",
+    "WorldTypeAccessor",
     "selection.SelectionMinecraftMixin",
     "selection.SelectionRenderBlocksMixin",
+    "selection.SelectionRenderGlobalMixin",
     "shader.LightmapHelperAccessor",
     "shader.MinecraftMixin",
     "shader.MobRendererMixin",
@@ -39,11 +43,7 @@
     "shader.ShadersRendererAccessor",
     "shader.ShadersRendererMixin",
     "weather.FixRainMixin",
-    "weather.FixSnowMixin",
-    "ScreenOptionsMixin",
-    "WorldMixin",
-    "WorldTypeAccessor",
-    "selection.SelectionRenderGlobalMixin"
+    "weather.FixSnowMixin"
   ],
   "injectors": {
     "defaultRequire": 1

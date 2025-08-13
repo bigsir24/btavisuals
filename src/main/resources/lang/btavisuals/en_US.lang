@@ -50,8 +50,8 @@ options.btavisuals.selector_blink_min=Min Blink Brightness
 options.btavisuals.selector_blink_max=Max Blink Brightness
 options.btavisuals.selector_depth_test=Depth Test
 
-options.btavisuals.enable_tone_map=Enable Tone Map
-options.btavisuals.enable_dither=Enable Dithering
+options.btavisuals.enable_tone_map=Tone Mapping
+options.btavisuals.enable_dither=Dithering
 options.btavisuals.red_bits=Red Bits
 options.btavisuals.green_bits=Green Bits
 options.btavisuals.blue_bits=Blue Bits
