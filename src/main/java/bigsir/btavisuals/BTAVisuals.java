@@ -116,12 +116,17 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 	public static Minecraft mc;
 	public static Shader shader;
 	public static KeyBinding recompile;
-	public static FloatBuffer bayerCache = BufferUtils.createFloatBuffer(4096);
+	public static KeyBinding test;
+	//public static FloatBuffer bayerCache = BufferUtils.createFloatBuffer(4096);
 	public static int bayerSizeCache;
 	public static float bayerBrightnessCache;
 	public static float bayerMaxCache;
 	public static float[] stepCache = new float[3];
 	public static int texMatrix = -1;
+	public static float bayerTexMiddle = 0;
+	public static float bayerTexOffset = 0;
+	/*public static int progress;
+	public static int oprogress;*/
 
 	public static void setupToneMap() {
 		float nRed = (float) Math.pow(2, redBits.value);
@@ -133,13 +138,25 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 	}
 
 	public static void setupBayer() {
-		//TODO somehow use a texture instead, couldn't get it working
 		float[] bayerArray = Bayer.gen1DBayerF(bayerMatrix.value);
-		bayerCache.position(0).limit(bayerArray.length);
+		/*bayerCache.position(0).limit(bayerArray.length);
 		bayerCache.put(bayerArray);
-		bayerCache.position(0).limit(bayerArray.length);
+		bayerCache.position(0).limit(bayerArray.length);*/
 		bayerMaxCache = (float) Bayer.max;
 		bayerSizeCache = (int) Math.pow(2, bayerMatrix.value+1);
+		bayerTexOffset = 1.0F / (bayerSizeCache*bayerSizeCache);
+		bayerTexMiddle = bayerTexOffset / 2.0F;
+
+		if (texMatrix != -1) GL11.glDeleteTextures(texMatrix);
+		texMatrix = GL11.glGenTextures();
+		GL11.glEnable(GL11.GL_TEXTURE_1D);
+		GL11.glBindTexture(GL11.GL_TEXTURE_1D, texMatrix);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_1D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		GL11.glTexImage1D(GL11.GL_TEXTURE_1D, 0, ARBTextureFloat.GL_RGB32F_ARB, bayerArray.length, 0, GL11.GL_RED, GL11.GL_FLOAT, bayerArray);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 	}
 
     @Override
@@ -156,6 +173,7 @@ public class BTAVisuals implements ModInitializer, ClientStartEntrypoint, Option
 		mc = Minecraft.getMinecraft();
 		shader = new Shader().compile(new ShaderProviderJar(MOD_ID), "post_dither");
 		recompile = new KeyBinding("options.compile").setDefault(InputDevice.keyboard, Keyboard.KEY_O);
+		test = new KeyBinding("options.test").setDefault(InputDevice.keyboard, Keyboard.KEY_P);
 
 		OptionsPage page = modPage = new OptionsPage(tk("options"), Items.PAINTBRUSH.getDefaultStack());
 		OptionsPages.register(page);

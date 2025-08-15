@@ -2,6 +2,7 @@
 
 uniform sampler2D colortex0;
 uniform sampler2D depthtex0;
+uniform sampler1D texMatrix;
 
 // Color correction params
 uniform float brightness;
@@ -37,6 +38,8 @@ uniform float farPlane;
 uniform vec3 falloffTone;
 uniform vec3 falloffDither;
 uniform int falloffType;
+uniform vec2 bayerTexMidOffset;
+//uniform float progress;
 
 varying vec2 texcoord;
 
@@ -206,10 +209,23 @@ void main() {
     float depth = falloffType == 0 ? fog_depth() : lin_depth();
     float start = falloffDither.x;
     float factor = clamp((start  - depth) / (start - falloffDither.y), 0, 1);
+
+    /*float testFactor = (progress - fog_depth()) / (progress - progress + 4);
+    gl_FragColor = vec4(vec3((1 - abs(testFactor))) , 1);
+    return;*/
+
+    /*float test = 1.0 / (bayerSize*bayerSize);
+    float mid = test / 2.0;
+    gl_FragColor = vec4(vec3(texture2D(texMatrix, vec2(mid +  * test, 0.5)).r), 1);
+    return;*/
+
     if (dither) {
         int w = (int(mod(gl_FragCoord.x, bayerSize)));
         int h = (int(mod(gl_FragCoord.y, bayerSize)));
-        float bayerVal = bayerBrightness * (bayer[w + h*bayerSize] - bayerMax * 0.5);
+        //float bayerVal = bayerBrightness * (bayer[w + h*bayerSize] - bayerMax * 0.5);
+        float test = 1.0 / (bayerSize*bayerSize);
+        float mid = test / 2.0;
+        float bayerVal = bayerBrightness * (texture1D(texMatrix, mid + (w + h*bayerSize) * test).r - bayerMax * 0.5);
 
         //gl_FragColor = vec4(vec3(1-factor, 0, 0), 1);
         //return;
